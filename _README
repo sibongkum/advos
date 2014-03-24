@@ -1,0 +1,19 @@
+1. Files modified
+include/linux/prinfo.h
+arch/arm/include/asm/unistd.h
+arch/arm/kernel/calls.S
+include/linux/syscalls.h
+
+2. main idea
+1) Add entry for diffrent platform with low level platform dependent modification;
+2) Provide a new system call(ptree) by the SYSCALL_DEFINEx micro;
+3) Implemente the ptree core logic;
+    a) allocate kernel memory buffer with kmalloc before traversal;
+    b) lock/unlock task_llist before/after traversal;
+    c) travel the whole process tree in DFS pre-order recursively starting by init_task;
+	d) while travelling, visit each process, gather necessary information and store the proinfo into kernel buffer if buffer size(nr) is bigger than process number gathered;
+	if not, just increase the process number;
+    e) calculate the youngest_child and next_sibling by comparing the pid;
+	f) copy the data from kernel space to user space;
+	g) test the system call;
+	h) adjust the output format;
